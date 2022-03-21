@@ -36,9 +36,83 @@ function preencherClimaAgora(cidade, estado, pais, temperatura, texto_clima, ico
 
 /******************* FUNÇÃO DE REQUIZIÇÃO AJAX **********************/
 
-/* PEGAR PREVIÇÃO DE CINCO DIAS
-http://dataservice.accuweather.com/forecasts/v1/daily/5day/36311?apikey=sxyZODGfy3bACQaLi7ACX6wHFuwFchVb&language=pt-br&metric=true
-*/
+/* grafico */
+
+function gerarGrafico() {
+    Highcharts.chart('hourly_chart', {
+        chart: {
+            type: 'line'
+        },
+        title: {
+            text: 'Monthly Average Temperature'
+        },
+        subtitle: {
+            text: 'Source: WorldClimate.com'
+        },
+        xAxis: {
+            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        },
+        yAxis: {
+            title: {
+                text: 'Temperature (°C)'
+            }
+        },
+        plotOptions: {
+            line: {
+                dataLabels: {
+                    enabled: true
+                },
+                enableMouseTracking: false
+            }
+        },
+        series: [{
+            name: 'Tokyo',
+            data: [7.0, 6.9, 9.5, 14.5, 18.4, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
+        }, {
+            name: 'London',
+            data: [3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
+        }]
+    });
+}
+
+gerarGrafico();
+
+/* PEGAR PREVIÇÃO DE CINCO DIAS JOGAR NO RODA PÉ*/ 
+function preencherPrevisao5Dias(previsoes) {
+
+    $("#info_5dias").html("");
+    var diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+
+
+    for (var a = 0; a < previsoes.length; a++) {
+
+        var dataHoje = new Date(previsoes[a].Date);
+        var dia_semana = diasSemana[ dataHoje.getDay() ];
+
+        var iconNumber = previsoes[a].Day.Icon <= 9 ? "0" + String(previsoes[a].Day.Icon) : String(previsoes[a].Day.Icon);
+        icone_clima = "https://developer.accuweather.com/sites/default/files/" + iconNumber + "-s.png";
+        maxima = String(previsoes[a].Temperature.Maximum.Value);
+        minimo = String(previsoes[a].Temperature.Minimum.Value);
+
+        elementoHTMLDia =   '<div class="day col">';
+        elementoHTMLDia +=  '<div class="day_inner">';
+        elementoHTMLDia +=  '<div class="dayname">';
+        elementoHTMLDia +=   dia_semana;
+        elementoHTMLDia +=   '</div>';
+        elementoHTMLDia +=  '<div style="background-image: url(\'' + icone_clima + '\')" class="daily_weather_icon"></div>';   
+        elementoHTMLDia +=  '<div class="max_min_temp">';
+        elementoHTMLDia +=   minimo + '&deg /' + maxima  + '&deg;';
+        elementoHTMLDia +=   '</div>';
+        elementoHTMLDia +=  '</div>';
+        elementoHTMLDia +=   '</div>';
+            
+        $("#info_5dias").append(elementoHTMLDia);  
+        elementoHTMLDia = ""; 
+    }
+}
+
+
+/* PEGAR PREVIÇÃO DE CINCO DIAS*/
 function pegarPrevisao5Dias(localCode) {
 
     $.ajax({
@@ -144,7 +218,8 @@ function pegarCoordenadasDoIP() {
 
 }
 
-pegarCoordenadasDoIP();
+/* DESABILITAR PARA PEGAR REQUISIÇÃO */
+//pegarCoordenadasDoIP();
 
 
 /* ULTIMA LINHA DA FUNCTION */ 
